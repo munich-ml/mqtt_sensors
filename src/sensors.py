@@ -76,9 +76,6 @@ def utc_from_timestamp(timestamp: float) -> dt.datetime:
     """Return a UTC time from a timestamp."""
     return UTC.localize(dt.datetime.utcfromtimestamp(timestamp))
 
-def get_last_boot():
-    return str(as_local(utc_from_timestamp(psutil.boot_time())).isoformat())
-
 
 # Temperature method depending on system distro
 def get_temp():
@@ -147,20 +144,6 @@ def hex2addr(hex_addr):
 
 
 sensors = {
-          'temperature':
-                {'name':'Temperature',
-                 'class': 'temperature',
-		         'state_class':'measurement',
-                 'unit': '°C',
-                 'icon': 'thermometer',
-                 'sensor_type': 'sensor',
-                 'function': get_temp},
-          'last_boot':
-                {'name': 'Last Boot',
-                 'class': 'timestamp',
-                 'icon': 'clock',
-                 'sensor_type': 'sensor',
-                 'function': get_last_boot},
           'hostname':
                 {'name': 'Hostname',
                  'icon': 'card-account-details',
@@ -171,6 +154,14 @@ sensors = {
                  'icon': 'lan',
                  'sensor_type': 'sensor',
                  'function': get_host_ip},
+          'temperature':
+                {'name':'Temperature',
+                 'class': 'temperature',
+		         'state_class':'measurement',
+                 'unit': '°C',
+                 'icon': 'thermometer',
+                 'sensor_type': 'sensor',
+                 'function': get_temp},
           'wifi_strength':
                 {'class': 'signal_strength',
                  'state_class':'measurement',
