@@ -1,31 +1,15 @@
 #!/usr/bin/env python3
 
-import re
 import time
 import pytz
 import psutil
 import socket
-import platform
 import subprocess
 import datetime as dt
 import sys
 import os
 
 
-rpi_power_disabled = True
-try:
-    from rpi_bad_power import new_under_voltage
-    if new_under_voltage() is not None:
-        # Only enable if import works and function returns a value
-        rpi_power_disabled = False
-except ImportError:
-    pass
-
-try:
-    import apt
-    apt_disabled = False
-except ImportError:
-    apt_disabled = True
 
 isDockerized = bool(os.getenv('YES_YOU_ARE_IN_A_CONTAINER', False))
 isOsRelease = os.path.isfile('/app/host/os-release')
@@ -46,13 +30,9 @@ with open(os_release) as f:
         row = line.strip().split("=")
         OS_DATA[row[0]] = row[1].strip('"')
 
-old_net_data = psutil.net_io_counters()
 previous_time = time.time() - 10
 UTC = pytz.utc
 DEFAULT_TIME_ZONE = None
-
-if not rpi_power_disabled:
-    _underVoltage = new_under_voltage()
 
 def set_default_timezone(timezone):
     global DEFAULT_TIME_ZONE

@@ -74,14 +74,12 @@ def send_config_message(mqttClient):
                     payload = (f'{{'
                             + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
 			    + (f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else '')
-                            + f'"name":"{deviceNameDisplay} {attr["name"]}",'
                             + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
                             + (f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else '')
                             + f'"value_template":"{{{{value_json.{sensor}}}}}",'
                             + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
                             + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
                             + f'"device":{{"identifiers":["{devicename}_sensor"],'
-                            + f'"name":"{deviceNameDisplay} Sensors","model":"{deviceModel}", "manufacturer":"{deviceManufacturer}"}}'
                             + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
                     		    + (f',{attr["prop"]}' if 'prop' in attr else '')
                             + f'}}'
@@ -133,39 +131,8 @@ def check_settings(settings):
     if 'user' in settings['mqtt'] and 'password' not in settings['mqtt']:
         write_message_to_console('password not defined in settings.yaml! Please check the documentation')
         sys.exit()
-    if 'power_status' in settings['sensors'] and rpi_power_disabled:
-        write_message_to_console('Unable to import rpi_bad_power library, or is incompatible on host architecture. Power supply info will not be shown.')
-        settings['sensors']['power_status'] = False
-    if 'updates' in settings['sensors'] and apt_disabled:
-        write_message_to_console('Unable to import apt package. Available updates will not be shown.')
-        settings['sensors']['updates'] = False
-    if 'power_integer_state' in settings:
-        write_message_to_console('power_integer_state is deprecated please remove this option power state is now a binary_sensor!')
 
-def add_drives():
-    drives = settings['sensors']['external_drives']
-    if drives is not None:
-        for drive in drives:
-            drive_path = settings['sensors']['external_drives'][drive]
-            usage = get_disk_usage(drive_path)
-            if usage:
-                sensors[f'disk_use_{drive.lower()}'] = external_drive_base(drive, drives[drive])
-                # Add drive to list with formatted name, for when checking sensors against settings items
-                external_drives.append(f'disk_use_{drive.lower()}')
-            else:
-                # Skip drives not found. Could be worth sending "not mounted" as the value if users want to track mount status.
-                print(drive + ' is not mounted to host. Check config or host drive mount settings.')
 
-# host model method depending on system distro
-def get_host_model():
-    if "rasp" in OS_DATA["ID"] and isDockerized and isDeviceTreeModel:
-        model = subprocess.check_output(["cat", "/app/host/proc/device-tree/model"]).decode("UTF-8").strip()
-        # remove a weird character breaking the json in mqtt explorer
-        model = model[:-1]
-    else:
-        # todo find a solid way to determine sbc manufacture
-        model = f'{deviceManufacturer} {deviceNameDisplay}'
-    return model
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -219,13 +186,8 @@ if __name__ == '__main__':
     # Check for settings that will prevent the script from communicating with MQTT broker or break the script
     check_settings(settings)
 
-    add_drives()
 
-    devicename = settings['devicename'].replace(' ', '').lower()
-    deviceNameDisplay = settings['devicename']
-    deviceManufacturer = "RPI Foundation" if "rasp" in OS_DATA["ID"] else OS_DATA['NAME']
-    deviceModel = get_host_model()
-    
+    devicename = settings['devicename'].replace(' ', '').lower()   
 
     mqttClient = mqtt.Client(client_id=settings['client_id'])
     mqttClient.on_connect = on_connect                      #attach function to callback
