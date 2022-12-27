@@ -1,29 +1,6 @@
 #!/usr/bin/env python3
 
-import pytz, psutil, socket, subprocess, sys
-import datetime as dt
-
-
-UTC = pytz.utc
-DEFAULT_TIME_ZONE = None
-
-def write_message_to_console(message):
-    print(message)
-    sys.stdout.flush()
-
-def as_local(dattim: dt.datetime) -> dt.datetime:
-    global DEFAULT_TIME_ZONE
-    """Convert a UTC datetime object to local time zone."""
-    if dattim.tzinfo == DEFAULT_TIME_ZONE:
-        return dattim
-    if dattim.tzinfo is None:
-        dattim = UTC.localize(dattim)
-
-    return dattim.astimezone(DEFAULT_TIME_ZONE)
-
-def utc_from_timestamp(timestamp: float) -> dt.datetime:
-    """Return a UTC time from a timestamp."""
-    return UTC.localize(dt.datetime.utcfromtimestamp(timestamp))
+import psutil, socket, subprocess, sys
 
 
 # Temperature method depending on system distro
@@ -55,10 +32,6 @@ def get_wifi_strength():  # subprocess.check_output(['/proc/net/wireless', 'grep
     return (wifi_strength_value)
 
 
-def get_hostname():
-    return socket.gethostname()
-
-
 def get_host_ip():
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -87,13 +60,12 @@ def hex2addr(hex_addr):
     return ip
 
 
-
 sensors = {
           'hostname':
                 {'name': 'Hostname',
                  'icon': 'card-account-details',
                  'sensor_type': 'sensor',
-                 'function': get_hostname},
+                 'function': socket.gethostname},
           'host_ip':
                 {'name': 'Host IP',
                  'icon': 'lan',

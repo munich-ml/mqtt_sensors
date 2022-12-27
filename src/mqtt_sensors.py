@@ -2,7 +2,7 @@
 import argparse, signal, sys, threading, time, yaml
 import paho.mqtt.client as mqtt
 import datetime as dt
-from sensors import sensors, write_message_to_console
+from sensors import sensors
 
 
 mqttClient = None
@@ -16,6 +16,11 @@ class ProgramKilled(Exception):
 def signal_handler(signum, frame):
     raise ProgramKilled
 
+def write_message_to_console(message):
+    print(message)
+    sys.stdout.flush()
+    
+    
 class Job(threading.Thread):
     def __init__(self, interval, execute, *args, **kwargs):
         threading.Thread.__init__(self)
