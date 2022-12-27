@@ -103,8 +103,7 @@ def _parser():
 
 
 def check_settings(settings):
-    values_to_check = ['mqtt', 'timezone', 'devicename', 'client_id', 'update_interval']
-    for value in values_to_check:
+    for value in ['mqtt', 'timezone', 'devicename', 'client_id', 'update_interval']:
         if value not in settings:
             write_message_to_console(value + ' not defined in settings.yaml! Please check the documentation')
             sys.exit()
@@ -131,6 +130,7 @@ def on_connect(client, userdata, flags, rc):
         sys.exit()
     else:
         write_message_to_console('Connection failed')
+
 
 def on_message(client, userdata, message):
     print (f'Message received: {message.payload.decode()}'  )
