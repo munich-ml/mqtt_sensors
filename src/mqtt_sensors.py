@@ -69,29 +69,33 @@ def send_config_message(mqttClient):
         try:
             # Added check in case sensor is an external drive, which is nested in the config
             if sensor in external_drives or settings['sensors'][sensor]:
+                payload = (f'{{'
+                        + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
+                        + (f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else '')
+                        + f'"name":"{deviceNameDisplay} {attr["name"]}",'
+                        + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
+                        + (f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else '')
+                        + f'"value_template":"{{{{value_json.{sensor}}}}}",'
+                        + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
+                        + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
+                        + f'"device":{{"identifiers":["{devicename}_sensor"],'
+                        + f'"name":"{deviceNameDisplay} Sensors""}}'
+                        + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
+                        + (f',{attr["prop"]}' if 'prop' in attr else '')
+                        + f'}}'
+                        ),                
                 mqttClient.publish(
                     topic=f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config',
-                    payload = (f'{{'
-                            + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
-			    + (f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else '')
-                            + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
-                            + (f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else '')
-                            + f'"value_template":"{{{{value_json.{sensor}}}}}",'
-                            + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
-                            + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
-                            + f'"device":{{"identifiers":["{devicename}_sensor"],'
-                            + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
-                    		    + (f',{attr["prop"]}' if 'prop' in attr else '')
-                            + f'}}'
-                            ),
+                    payload = payload
                     qos=1,
                     retain=True,
                 )
+                print("confic_message", payload)
         except Exception as e:
             write_message_to_console('An error was produced while processing ' + str(sensor) + ' with exception: ' + str(e))
             print(str(settings))
             raise
-
+        
     mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
 
 def _parser():
@@ -188,7 +192,8 @@ if __name__ == '__main__':
 
 
     devicename = settings['devicename'].replace(' ', '').lower()   
-
+    deviceNameDisplay = settings['devicename']
+    
     mqttClient = mqtt.Client(client_id=settings['client_id'])
     mqttClient.on_connect = on_connect                      #attach function to callback
     mqttClient.on_message = on_message
