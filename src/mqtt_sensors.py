@@ -11,7 +11,7 @@ devicename = None
 settings = {}
 
 
-def write_message_to_console(message):
+def print_w_flush(message):
     print(message)
     sys.stdout.flush()
     
@@ -50,7 +50,7 @@ def update_sensors():
 
 def send_config_message(mqttClient):
 
-    write_message_to_console('Sending config message to host...')
+    print_w_flush('Sending config message to host...')
 
     for sensor, attr in sensors.items():
         try:
@@ -81,7 +81,7 @@ def send_config_message(mqttClient):
                     retain=True,
                 )
         except Exception as e:
-            write_message_to_console('An error was produced while processing ' + str(sensor) + ' with exception: ' + str(e))
+            print_w_flush('An error was produced while processing ' + str(sensor) + ' with exception: ' + str(e))
             print(str(settings))
             raise
         
@@ -97,19 +97,19 @@ def _parser():
 def check_settings(settings):
     for value in ['mqtt', 'timezone', 'devicename', 'client_id', 'update_interval']:
         if value not in settings:
-            write_message_to_console(value + ' not defined in settings.yaml! Please check the documentation')
+            print_w_flush(value + ' not defined in settings.yaml! Please check the documentation')
             sys.exit()
     if 'hostname' not in settings['mqtt']:
-        write_message_to_console('hostname not defined in settings.yaml! Please check the documentation')
+        print_w_flush('hostname not defined in settings.yaml! Please check the documentation')
         sys.exit()
     if 'user' in settings['mqtt'] and 'password' not in settings['mqtt']:
-        write_message_to_console('password not defined in settings.yaml! Please check the documentation')
+        print_w_flush('password not defined in settings.yaml! Please check the documentation')
         sys.exit()
 
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        write_message_to_console('Connected to broker')
+        print_w_flush('Connected to broker')
         print("subscribing : hass/status")
         client.subscribe('hass/status')
         print("subscribing : " + f"system-sensors/sensor/{devicename}/availability")
@@ -118,10 +118,10 @@ def on_connect(client, userdata, flags, rc):
         client.subscribe(f"system-sensors/sensor/{devicename}/command")#subscribe
         client.publish(f"system-sensors/sensor/{devicename}/command", "setup", retain=True)
     elif rc == 5:
-        write_message_to_console('Authentication failed.\n Exiting.')
+        print_w_flush('Authentication failed.\n Exiting.')
         sys.exit()
     else:
-        write_message_to_console('Connection failed')
+        print_w_flush('Connection failed')
 
 
 def on_message(client, userdata, message):
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         args = _parser().parse_args()
         settings_file = args.settings
     except:
-        write_message_to_console('Could not find settings.yaml. Please check the documentation')
+        print_w_flush('Could not find settings.yaml. Please check the documentation')
         exit()
 
     with open(settings_file) as f:
@@ -176,12 +176,12 @@ if __name__ == '__main__':
     try:
         send_config_message(mqttClient)
     except Exception as e:
-        write_message_to_console('Error while attempting to send config to MQTT host: ' + str(e))
+        print_w_flush('Error while attempting to send config to MQTT host: ' + str(e))
         exit()
     try:
         update_sensors()
     except Exception as e:
-        write_message_to_console('Error while attempting to perform inital sensor update: ' + str(e))
+        print_w_flush('Error while attempting to perform inital sensor update: ' + str(e))
         exit()
 
     job = Job(interval=dt.timedelta(seconds=settings["update_interval"]), execute=update_sensors)
@@ -194,7 +194,7 @@ if __name__ == '__main__':
             sys.stdout.flush()
             time.sleep(1)
         except KeyboardInterrupt:
-            write_message_to_console('Program killed: running cleanup code')
+            print_w_flush('Program killed: running cleanup code')
             mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
             mqttClient.disconnect()
             mqttClient.loop_stop()
