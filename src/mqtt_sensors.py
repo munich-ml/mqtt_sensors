@@ -193,7 +193,7 @@ if __name__ == '__main__':
         try:
             sys.stdout.flush()
             time.sleep(1)
-        except Exception:
+        except KeyboardInterrupt:
             write_message_to_console('Program killed: running cleanup code')
             mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
             mqttClient.disconnect()
