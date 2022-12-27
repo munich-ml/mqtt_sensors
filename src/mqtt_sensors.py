@@ -6,7 +6,6 @@ from sensors import sensors
 
 
 mqttClient = None
-global poll_interval
 devicename = None
 settings = {}
 
@@ -90,6 +89,7 @@ def send_config_message(mqttClient):
         
     mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
 
+
 def _parser():
     """Generate argument parser"""
     parser = argparse.ArgumentParser()
@@ -118,7 +118,8 @@ def on_connect(client, userdata, flags, rc):
         print("subscribing : " + f"system-sensors/sensor/{devicename}/availability")
         mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
         print("subscribing : " + f"system-sensors/sensor/{devicename}/command")
-        client.subscribe(f"system-sensors/sensor/{devicename}/command")#subscribe
+        client.subscribe(f"system-sensors/sensor/{devicename}/command") #subscribe
+        client.subscribt("system-sensors/sensor/to_wallbox")
         client.publish(f"system-sensors/sensor/{devicename}/command", "setup", retain=True)
     elif rc == 5:
         print_w_flush('Authentication failed.\n Exiting.')
@@ -128,7 +129,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, message):
-    print (f'Message received: {message.payload.decode()}'  )
+    print (f'Message received: {message.payload.decode()} userdata={userdata}')
     if message.payload.decode() == 'online':
         send_config_message(client)
 
