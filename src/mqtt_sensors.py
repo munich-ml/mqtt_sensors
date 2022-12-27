@@ -136,12 +136,6 @@ def on_message(client, userdata, message):
     print (f'Message received: {message.payload.decode()}'  )
     if message.payload.decode() == 'online':
         send_config_message(client)
-    elif message.payload.decode() == "display_on":
-        reading = subprocess.check_output([vcgencmd, "display_power", "1"]).decode("UTF-8")
-        update_sensors()
-    elif message.payload.decode() == "display_off":
-        reading = subprocess.check_output([vcgencmd, "display_power", "0"]).decode("UTF-8")
-        update_sensors()
 
 
 if __name__ == '__main__':

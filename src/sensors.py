@@ -11,26 +11,6 @@ import os
 
 
 
-isDockerized = bool(os.getenv('YES_YOU_ARE_IN_A_CONTAINER', False))
-isOsRelease = os.path.isfile('/app/host/os-release')
-isHostname = os.path.isfile('/app/host/hostname')
-isDeviceTreeModel = os.path.isfile('/app/host/proc/device-tree/model')
-isSystemSensorPipe = os.path.isfile('/app/host/system_sensor_pipe')
-
-vcgencmd   = "vcgencmd"
-os_release = "/etc/os-release"
-if isDockerized:
-    os_release = "/app/host/os-release" if isOsRelease else '/etc/os-release'
-    vcgencmd   = "/opt/vc/bin/vcgencmd"
-
-# Get OS information
-OS_DATA = {}
-with open(os_release) as f:
-    for line in f.readlines():
-        row = line.strip().split("=")
-        OS_DATA[row[0]] = row[1].strip('"')
-
-previous_time = time.time() - 10
 UTC = pytz.utc
 DEFAULT_TIME_ZONE = None
 
@@ -87,11 +67,7 @@ def get_wifi_strength():  # subprocess.check_output(['/proc/net/wireless', 'grep
 
 
 def get_hostname():
-    if isDockerized and isHostname:
-        host = subprocess.check_output(["cat", "/app/host/hostname"]).decode("UTF-8").strip()
-    else:
-        host = socket.gethostname()
-    return host
+    return socket.gethostname()
 
 
 def get_host_ip():
