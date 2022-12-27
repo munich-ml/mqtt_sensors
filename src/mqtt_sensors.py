@@ -83,10 +83,10 @@ def send_config_message(mqttClient):
                         + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
                         + (f',{attr["prop"]}' if 'prop' in attr else '')
                         + f'}}'
-                        ),                
+                        )           
                 mqttClient.publish(
                     topic=f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config',
-                    payload = payload
+                    payload = payload,
                     qos=1,
                     retain=True,
                 )
