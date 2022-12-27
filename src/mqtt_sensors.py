@@ -50,15 +50,15 @@ def update_sensors():
         # Skip sensors that have been disabled or are missing
         if sensor in external_drives or (settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True):
             payload_str += f'"{sensor}": "{attr["function"]()}",'
-            payload_str = payload_str[:-1]
-            payload_str += f'}}'
-            topic = f'system-sensors/{attr["sensor_type"]}/{devicename}/state'
-            pub_ret = mqttClient.publish(
-                topic=topic,
-                payload=payload_str,
-                qos=1,
-                retain=False)
-            print(f"{pub_ret} from publish(topic={topic}, payload={payload_str})")
+    payload_str = payload_str[:-1]
+    payload_str += f'}}'
+    topic = f'system-sensors/{attr["sensor_type"]}/{devicename}/state'
+    pub_ret = mqttClient.publish(
+        topic=topic,
+        payload=payload_str,
+        qos=1,
+        retain=False)
+    print(f"{pub_ret} from publish(topic={topic}, payload={payload_str})")
 
 
 def send_config_message(mqttClient):
