@@ -37,6 +37,10 @@ class Job(threading.Thread):
 
 def update_sensors():
     payload_str = f'{{'
+    for sensor, attr in sensors.items():
+        # Skip sensors that have been disabled or are missing
+        if settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True:
+            payload_str += f'"{sensor}": "{attr["function"]()}",'
     payload_str = payload_str[:-1]
     payload_str += f'}}'
     topic = f'system-sensors/sensor/{devicename}/state'
