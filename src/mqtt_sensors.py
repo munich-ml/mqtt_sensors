@@ -101,23 +101,6 @@ def _parser():
     parser.add_argument('settings', help='path to the settings file')
     return parser
 
-def set_defaults(settings):
-    global poll_interval
-    set_default_timezone(pytz.timezone(settings['timezone']))
-    poll_interval = settings['update_interval'] if 'update_interval' in settings else 60
-    if 'port' not in settings['mqtt']:
-        settings['mqtt']['port'] = 1883
-    if 'sensors' not in settings:
-        settings['sensors'] = {}
-    for sensor in sensors:
-        if sensor not in settings['sensors']:
-            settings['sensors'][sensor] = True
-    if "rasp" not in OS_DATA["ID"]:
-        settings['sensors']['display'] = False
-
-    # 'settings' argument is local, so needs to be returned to overwrite the one in the main function
-    return settings
-
 
 def check_settings(settings):
     values_to_check = ['mqtt', 'timezone', 'devicename', 'client_id']
@@ -166,25 +149,16 @@ if __name__ == '__main__':
         args = _parser().parse_args()
         settings_file = args.settings
     except:
-        write_message_to_console('Attempting to find settings file in same folder as ' + str(__file__))
-        default_settings_path = str(pathlib.Path(__file__).parent.resolve()) + '/settings.yaml'
-        if path.isfile(default_settings_path):
-            write_message_to_console('Settings file found, attempting to continue...')
-            settings_file = default_settings_path
-        else:
-            write_message_to_console('Could not find settings.yaml. Please check the documentation')
-            exit()
+        write_message_to_console('Could not find settings.yaml. Please check the documentation')
+        exit()
 
     with open(settings_file) as f:
         settings = yaml.safe_load(f)
 
     # Make settings file keys all lowercase
     settings = {k.lower(): v for k,v in settings.items()}
-    # Prep settings with defaults if keys missingf
-    settings = set_defaults(settings)
     # Check for settings that will prevent the script from communicating with MQTT broker or break the script
     check_settings(settings)
-
 
     devicename = settings['devicename'].replace(' ', '').lower()   
     deviceNameDisplay = settings['devicename']
