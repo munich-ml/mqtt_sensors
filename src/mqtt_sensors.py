@@ -103,7 +103,7 @@ def _parser():
 
 
 def check_settings(settings):
-    values_to_check = ['mqtt', 'timezone', 'devicename', 'client_id']
+    values_to_check = ['mqtt', 'timezone', 'devicename', 'client_id', 'update_interval']
     for value in values_to_check:
         if value not in settings:
             write_message_to_console(value + ' not defined in settings.yaml! Please check the documentation')
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         write_message_to_console('Error while attempting to perform inital sensor update: ' + str(e))
         exit()
 
-    job = Job(interval=dt.timedelta(seconds=poll_interval), execute=update_sensors)
+    job = Job(interval=dt.timedelta(seconds=settings["update_interval"]), execute=update_sensors)
     job.start()
 
     mqttClient.loop_start()
