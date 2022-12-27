@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
 
-import time
-import pytz
-import psutil
-import socket
-import subprocess
+import pytz, psutil, socket, subprocess, sys
 import datetime as dt
-import sys
-import os
-
 
 
 UTC = pytz.utc
 DEFAULT_TIME_ZONE = None
-
-def set_default_timezone(timezone):
-    global DEFAULT_TIME_ZONE
-    DEFAULT_TIME_ZONE = timezone
 
 def write_message_to_console(message):
     print(message)

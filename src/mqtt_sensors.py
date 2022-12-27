@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
-
-from os import error, path
-import sys
-import time
-import yaml
-import signal
-import pathlib
-import argparse
-import threading
+import argparse, signal, sys, threading, time, yaml
 import paho.mqtt.client as mqtt
-
-from sensors import *
+import datetime as dt
+from sensors import sensors, write_message_to_console
 
 
 mqttClient = None
