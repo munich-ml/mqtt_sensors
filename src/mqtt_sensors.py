@@ -119,7 +119,7 @@ def on_connect(client, userdata, flags, rc):
         mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
         print("subscribing : " + f"system-sensors/sensor/{devicename}/command")
         client.subscribe(f"system-sensors/sensor/{devicename}/command") #subscribe
-        client.subscribt("system-sensors/sensor/to_wallbox")
+        client.subscribe("system-sensors/sensor/to_wallbox")
         client.publish(f"system-sensors/sensor/{devicename}/command", "setup", retain=True)
     elif rc == 5:
         print_w_flush('Authentication failed.\n Exiting.')
