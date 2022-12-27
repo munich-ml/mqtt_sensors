@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import argparse, signal, sys, threading, time, yaml
+import argparse, sys, threading, time, yaml
 import paho.mqtt.client as mqtt
 import datetime as dt
 from sensors import sensors
@@ -10,11 +10,6 @@ global poll_interval
 devicename = None
 settings = {}
 
-class ProgramKilled(Exception):
-    pass
-
-def signal_handler(signum, frame):
-    raise ProgramKilled
 
 def write_message_to_console(message):
     print(message)
@@ -163,8 +158,6 @@ if __name__ == '__main__':
             settings['mqtt']['user'], settings['mqtt']['password']
         )
 
-    signal.signal(signal.SIGTERM, signal_handler)
-    signal.signal(signal.SIGINT, signal_handler)
 
     while True:
         try:
@@ -200,7 +193,7 @@ if __name__ == '__main__':
         try:
             sys.stdout.flush()
             time.sleep(1)
-        except ProgramKilled:
+        except Exception:
             write_message_to_console('Program killed: running cleanup code')
             mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
             mqttClient.disconnect()
