@@ -84,7 +84,9 @@ def send_config_message(mqttClient):
                         + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
                             + (f',{attr["prop"]}' if 'prop' in attr else '')
                         + f'}}'
-                        ),                
+                        )
+                print("publish topic=", topic)
+                print("payload", payload)           
                 mqttClient.publish(
                     topic = topic,
                     payload = payload,
