@@ -17,7 +17,6 @@ mqttClient = None
 global poll_interval
 devicename = None
 settings = {}
-external_drives = []
 
 class ProgramKilled(Exception):
     pass
@@ -46,13 +45,9 @@ class Job(threading.Thread):
 
 def update_sensors():
     payload_str = f'{{'
-    for sensor, attr in sensors.items():
-        # Skip sensors that have been disabled or are missing
-        if sensor in external_drives or (settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True):
-            payload_str += f'"{sensor}": "{attr["function"]()}",'
     payload_str = payload_str[:-1]
     payload_str += f'}}'
-    topic = f'system-sensors/{attr["sensor_type"]}/{devicename}/state'
+    topic = f'system-sensors/sensor/{devicename}/state'
     pub_ret = mqttClient.publish(
         topic=topic,
         payload=payload_str,
@@ -68,7 +63,7 @@ def send_config_message(mqttClient):
     for sensor, attr in sensors.items():
         try:
             # Added check in case sensor is an external drive, which is nested in the config
-            if sensor in external_drives or settings['sensors'][sensor]:
+            if settings['sensors'][sensor]:
                 topic = f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config'
                 payload = (f'{{'
                         + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
@@ -117,8 +112,6 @@ def set_defaults(settings):
     for sensor in sensors:
         if sensor not in settings['sensors']:
             settings['sensors'][sensor] = True
-    if 'external_drives' not in settings['sensors'] or settings['sensors']['external_drives'] is None:
-        settings['sensors']['external_drives'] = {}
     if "rasp" not in OS_DATA["ID"]:
         settings['sensors']['display'] = False
 
