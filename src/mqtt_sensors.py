@@ -44,7 +44,6 @@ class Job(threading.Thread):
             self.execute(*self.args, **self.kwargs)
 
 
-
 def update_sensors():
     payload_str = f'{{'
     for sensor, attr in sensors.items():
@@ -53,12 +52,13 @@ def update_sensors():
             payload_str += f'"{sensor}": "{attr["function"]()}",'
     payload_str = payload_str[:-1]
     payload_str += f'}}'
-    mqttClient.publish(
+    pub_ret = mqttClient.publish(
         topic=f'system-sensors/{attr["sensor_type"]}/{devicename}/state',
         payload=payload_str,
         qos=1,
         retain=False,
     )
+    print(pub_ret, payload_str)
 
 
 def send_config_message(mqttClient):
@@ -119,6 +119,7 @@ def set_defaults(settings):
     # 'settings' argument is local, so needs to be returned to overwrite the one in the main function
     return settings
 
+
 def check_settings(settings):
     values_to_check = ['mqtt', 'timezone', 'devicename', 'client_id']
     for value in values_to_check:
@@ -131,7 +132,6 @@ def check_settings(settings):
     if 'user' in settings['mqtt'] and 'password' not in settings['mqtt']:
         write_message_to_console('password not defined in settings.yaml! Please check the documentation')
         sys.exit()
-
 
 
 def on_connect(client, userdata, flags, rc):
