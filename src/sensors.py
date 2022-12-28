@@ -71,14 +71,6 @@ sensors = {
                  'icon': 'lan',
                  'sensor_type': 'sensor',
                  'function': get_host_ip},
-          'temperature':
-                {'name':'Temperature',
-                 'class': 'temperature',
-		         'state_class':'measurement',
-                 'unit': '°C',
-                 'icon': 'thermometer',
-                 'sensor_type': 'sensor',
-                 'function': get_temp},
           'wifi_strength':
                 {'class': 'signal_strength',
                  'state_class':'measurement',
@@ -87,5 +79,13 @@ sensors = {
                  'icon': 'wifi',
                  'sensor_type': 'sensor',
                  'function': get_wifi_strength},
+          'temperature':
+                {'name':'Temperature',
+                 'class': 'temperature',
+		         'state_class':'measurement',
+                 'unit': '°C',
+                 'icon': 'thermometer',
+                 'sensor_type': 'sensor',
+                 'function': get_temp},
           }
 
