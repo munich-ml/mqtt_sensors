@@ -54,14 +54,14 @@ def send_config_message(mqttClient):
             payload =  f'{{'
             payload += f'"device_class":"{attr["device_class"]}",' if 'device_class' in attr else ''
             payload += f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else ''
-            payload += f'"name":"{deviceNameDisplay} {attr["name"]}",'
+            payload += f'"name":"{devicename} {attr["name"]}",'
             payload += f'"state_topic":"homeassistant/sensor/{devicename}/state",'
             payload += f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else ''
             payload += f'"value_template":"{{{{value_json.{sensor}}}}}",'
             payload += f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
             payload += f'"availability_topic":"homeassistant/sensor/{devicename}/availability",'
             payload += f'"device":{{"identifiers":["{devicename}_sensor"],'
-            payload += f'"name":"{deviceNameDisplay} Sensors"}}'
+            payload += f'"name":"{devicename}"}}'
             payload += f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else ''
             payload += f',{attr["prop"]}' if 'prop' in attr else ''
             payload += f'}}'    
@@ -138,7 +138,6 @@ if __name__ == '__main__':
     check_settings(settings)
 
     devicename = settings['devicename'].replace(' ', '').lower()   
-    deviceNameDisplay = settings['devicename']
     
     mqttClient = mqtt.Client(client_id=settings['client_id'])
     mqttClient.on_connect = on_connect                      #attach function to callback
