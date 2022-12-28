@@ -51,20 +51,21 @@ def send_config_message(mqttClient):
     for sensor, attr in sensors.items():
         try:
             topic = f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config'
-            payload = ('{'
-                    + f'"device_class":"{attr["class"]}",' if 'class' in attr else ''
-                    + f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else ''
-                    + f'"name":"{deviceNameDisplay} {attr["name"]}",'
-                    + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
-                    + f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else ''
-                    + f'"value_template":"{{{{value_json.{sensor}}}}}",'
-                    + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
-                    + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
-                    + f'"device":{{"identifiers":["{devicename}_sensor"],'
-                    + f'"name":"{deviceNameDisplay} Sensors"}}'
-                    + f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else ''
-                    + f',{attr["prop"]}' if 'prop' in attr else ''
-                    + '}')
+            payload = (f'{{'
+                            + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
+			    + (f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else '')
+                            + f'"name":"{deviceNameDisplay} {attr["name"]}",'
+                            + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
+                            + (f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else '')
+                            + f'"value_template":"{{{{value_json.{sensor}}}}}",'
+                            + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
+                            + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
+                            + f'"device":{{"identifiers":["{devicename}_sensor"],'
+                            + f'"name":"{deviceNameDisplay} Sensors",}}'
+                            + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
+                    		    + (f',{attr["prop"]}' if 'prop' in attr else '')
+                            + f'}}'
+                            ),
             print("publish topic=", topic)
             print("publish payload=", payload)           
             mqttClient.publish(topic=topic, payload=payload, qos=1, retain=True)
