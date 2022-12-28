@@ -54,7 +54,7 @@ def update_sensors():
     payload_str = payload_str[:-1]
     payload_str += f'}}'
     mqttClient.publish(
-        topic=f'system-sensors/{attr["sensor_type"]}/{devicename}/state',
+        topic=f'homeassistant/{attr["sensor_type"]}/{devicename}/state',
         payload=payload_str,
         qos=1,
         retain=False,
@@ -73,11 +73,11 @@ def send_config_message(mqttClient):
                         + (f'"device_class":"{attr["class"]}",' if 'class' in attr else '')
             + (f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else '')
                         + f'"name":"{deviceNameDisplay} {attr["name"]}",'
-                        + f'"state_topic":"system-sensors/sensor/{devicename}/state",'
+                        + f'"state_topic":"homeassistant/sensor/{devicename}/state",'
                         + (f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else '')
                         + f'"value_template":"{{{{value_json.{sensor}}}}}",'
                         + f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
-                        + f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
+                        + f'"availability_topic":"homeassistant/sensor/{devicename}/availability",'
                         + f'"device":{{"identifiers":["{devicename}_sensor"],'
                         + f'"name":"{deviceNameDisplay} Sensors","model":"{deviceModel}", "manufacturer":"{deviceManufacturer}"}}'
                         + (f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else '')
@@ -97,7 +97,7 @@ def send_config_message(mqttClient):
             print(str(settings))
             raise
 
-    mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
+    mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'online', retain=True)
 
 def _parser():
     """Generate argument parser"""
@@ -175,11 +175,11 @@ def on_connect(client, userdata, flags, rc):
         write_message_to_console('Connected to broker')
         print("subscribing : hass/status")
         client.subscribe('hass/status')
-        print("subscribing : " + f"system-sensors/sensor/{devicename}/availability")
-        mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
-        print("subscribing : " + f"system-sensors/sensor/{devicename}/command")
-        client.subscribe(f"system-sensors/sensor/{devicename}/command")#subscribe
-        client.publish(f"system-sensors/sensor/{devicename}/command", "setup", retain=True)
+        print("subscribing : " + f"homeassistant/sensor/{devicename}/availability")
+        mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'online', retain=True)
+        print("subscribing : " + f"homeassistant/sensor/{devicename}/command")
+        client.subscribe(f"homeassistant/sensor/{devicename}/command")#subscribe
+        client.publish(f"homeassistant/sensor/{devicename}/command", "setup", retain=True)
     elif rc == 5:
         write_message_to_console('Authentication failed.\n Exiting.')
         sys.exit()
@@ -233,7 +233,7 @@ if __name__ == '__main__':
     mqttClient = mqtt.Client(client_id=settings['client_id'])
     mqttClient.on_connect = on_connect                      #attach function to callback
     mqttClient.on_message = on_message
-    mqttClient.will_set(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
+    mqttClient.will_set(f'homeassistant/sensor/{devicename}/availability', 'offline', retain=True)
     if 'user' in settings['mqtt']:
         mqttClient.username_pw_set(
             settings['mqtt']['user'], settings['mqtt']['password']
@@ -278,7 +278,7 @@ if __name__ == '__main__':
             time.sleep(1)
         except ProgramKilled:
             write_message_to_console('Program killed: running cleanup code')
-            mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
+            mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'offline', retain=True)
             mqttClient.disconnect()
             mqttClient.loop_stop()
             sys.stdout.flush()
