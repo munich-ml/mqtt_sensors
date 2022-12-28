@@ -90,7 +90,7 @@ def send_config_message(mqttClient):
                     qos=1,
                     retain=True,
                 )
-                if sensor in ("hostname", "temperature"):
+                if sensor in ("wifi_strength", "temperature"):
                     print("payload", type(payload), payload)
         except Exception as e:
             write_message_to_console('An error was produced while processing ' + str(sensor) + ' with exception: ' + str(e))
