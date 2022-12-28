@@ -73,12 +73,7 @@ def send_config_message(mqttClient):
                     + '}')
             print("publish topic=", topic)
             print("publish payload=", payload)           
-            mqttClient.publish(
-                topic = topic,
-                payload = payload,
-                qos=1,
-                retain=True,
-
+            mqttClient.publish(topic=topic, payload=payload, qos=1, retain=True)
         except Exception as e:
             print_w_flush('An error was produced while processing ' + str(sensor) + ' with exception: ' + str(e))
             print(str(settings))
