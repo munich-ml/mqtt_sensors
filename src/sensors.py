@@ -72,7 +72,7 @@ sensors = {
                  'sensor_type': 'sensor',
                  'function': get_host_ip},
           'wifi_strength':
-                {'class': 'signal_strength',
+                {"device_class": 'signal_strength',
                  'state_class':'measurement',
                  'name':'Wifi Strength',
                  'unit': 'dBm',
@@ -81,7 +81,7 @@ sensors = {
                  'function': get_wifi_strength},
           'temperature':
                 {'name':'Temperature',
-                 'class': 'temperature',
+                 'device_class': 'temperature',
 		         'state_class':'measurement',
                  'unit': '°C',
                  'icon': 'thermometer',

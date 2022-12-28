@@ -52,7 +52,7 @@ def send_config_message(mqttClient):
         try:
             topic = f'homeassistant/{attr["sensor_type"]}/{devicename}/{sensor}/config'
             payload =  f'{{'
-            payload += f'"device_class":"{attr["class"]}",' if 'class' in attr else ''
+            payload += f'"device_class":"{attr["device_class"]}",' if 'device_class' in attr else ''
             payload += f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else ''
             payload += f'"name":"{deviceNameDisplay} {attr["name"]}",'
             payload += f'"state_topic":"system-sensors/sensor/{devicename}/state",'
