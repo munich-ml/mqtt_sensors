@@ -7,8 +7,3 @@ deviceName: pi3
 client_id: client_id_not_set
 timezone: Europe/Brussels
 update_interval: 60       # Defaults to 60
-sensors:
-  hostname: true
-  host_ip: true
-  temperature: true
-  wifi_strength: true
