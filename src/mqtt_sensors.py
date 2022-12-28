@@ -39,7 +39,7 @@ def update_sensors():
     for sensor, attr in sensors.items():        
         payload += f'"{sensor}": "{attr["function"]()}",'
     payload = payload[:-1] + '}'
-    topic = f'system-sensors/sensor/{devicename}/state'
+    topic = f'homeassistant/sensor/{devicename}/state'
     pub_ret = mqttClient.publish(topic=topic, payload=payload, qos=1, retain=False)
     print(f"{pub_ret} from publish(topic={topic}, payload={payload})")
 
@@ -55,11 +55,11 @@ def send_config_message(mqttClient):
             payload += f'"device_class":"{attr["device_class"]}",' if 'device_class' in attr else ''
             payload += f'"state_class":"{attr["state_class"]}",' if 'state_class' in attr else ''
             payload += f'"name":"{deviceNameDisplay} {attr["name"]}",'
-            payload += f'"state_topic":"system-sensors/sensor/{devicename}/state",'
+            payload += f'"state_topic":"homeassistant/sensor/{devicename}/state",'
             payload += f'"unit_of_measurement":"{attr["unit"]}",' if 'unit' in attr else ''
             payload += f'"value_template":"{{{{value_json.{sensor}}}}}",'
             payload += f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
-            payload += f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
+            payload += f'"availability_topic":"homeassistant/sensor/{devicename}/availability",'
             payload += f'"device":{{"identifiers":["{devicename}_sensor"],'
             payload += f'"name":"{deviceNameDisplay} Sensors"}}'
             payload += f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else ''
@@ -74,7 +74,7 @@ def send_config_message(mqttClient):
             print(str(settings))
             raise
         
-    mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
+    mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'online', retain=True)
 
 
 def _parser():
@@ -102,12 +102,12 @@ def on_connect(client, userdata, flags, rc):
         print_w_flush('Connected to broker')
         print("subscribing : hass/status")
         client.subscribe('hass/status')
-        print("subscribing : " + f"system-sensors/sensor/{devicename}/availability")
-        mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'online', retain=True)
-        print("subscribing : " + f"system-sensors/sensor/{devicename}/command")
-        client.subscribe(f"system-sensors/sensor/{devicename}/command") #subscribe
-        client.subscribe("system-sensors/sensor/to_wallbox")
-        client.publish(f"system-sensors/sensor/{devicename}/command", "setup", retain=True)
+        print("subscribing : " + f"homeassistant/sensor/{devicename}/availability")
+        mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'online', retain=True)
+        print("subscribing : " + f"homeassistant/sensor/{devicename}/command")
+        client.subscribe(f"homeassistant/sensor/{devicename}/command") #subscribe
+        client.subscribe("homeassistant/sensor/to_wallbox")
+        client.publish(f"homeassistant/sensor/{devicename}/command", "setup", retain=True)
     elif rc == 5:
         print_w_flush('Authentication failed.\n Exiting.')
         sys.exit()
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     mqttClient = mqtt.Client(client_id=settings['client_id'])
     mqttClient.on_connect = on_connect                      #attach function to callback
     mqttClient.on_message = on_message
-    mqttClient.will_set(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
+    mqttClient.will_set(f'homeassistant/sensor/{devicename}/availability', 'offline', retain=True)
     if 'user' in settings['mqtt']:
         mqttClient.username_pw_set(
             settings['mqtt']['user'], settings['mqtt']['password']
@@ -186,7 +186,7 @@ if __name__ == '__main__':
             time.sleep(1)
         except KeyboardInterrupt:
             print_w_flush('Program killed: running cleanup code')
-            mqttClient.publish(f'system-sensors/sensor/{devicename}/availability', 'offline', retain=True)
+            mqttClient.publish(f'homeassistant/sensor/{devicename}/availability', 'offline', retain=True)
             mqttClient.disconnect()
             mqttClient.loop_stop()
             sys.stdout.flush()
