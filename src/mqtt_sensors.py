@@ -61,7 +61,7 @@ def send_config_message(mqttClient):
             payload += f'"unique_id":"{devicename}_{attr["sensor_type"]}_{sensor}",'
             payload += f'"availability_topic":"system-sensors/sensor/{devicename}/availability",'
             payload += f'"device":{{"identifiers":["{devicename}_sensor"],'
-            payload += f'"name":"{deviceNameDisplay} Sensors",}}'
+            payload += f'"name":"{deviceNameDisplay} Sensors"}}'
             payload += f',"icon":"mdi:{attr["icon"]}"' if 'icon' in attr else ''
             payload += f',{attr["prop"]}' if 'prop' in attr else ''
             payload += f'}}'    
