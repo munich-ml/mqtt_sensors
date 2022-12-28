@@ -119,3 +119,4 @@ system_sensors.service
 # ignore config directory created by docker
 /config
 src/understand.py
+src/secrets.yaml
