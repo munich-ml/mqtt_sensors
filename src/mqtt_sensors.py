@@ -36,17 +36,11 @@ class Job(threading.Thread):
 
 def update_sensors():
     payload = '{'
-    for sensor, attr in sensors.items():
-        # Skip sensors that have been disabled or are missing
-        if settings['sensors'][sensor] is not None and settings['sensors'][sensor] == True:
-            payload += f'"{sensor}": "{attr["function"]()}",'
+    for sensor, attr in sensors.items():        
+        payload += f'"{sensor}": "{attr["function"]()}",'
     payload = payload[:-1] + '}'
     topic = f'system-sensors/sensor/{devicename}/state'
-    pub_ret = mqttClient.publish(
-        topic=topic,
-        payload=payload,
-        qos=1,
-        retain=False)
+    pub_ret = mqttClient.publish(topic=topic, payload=payload, qos=1, retain=False)
     print(f"{pub_ret} from publish(topic={topic}, payload={payload})")
 
 
