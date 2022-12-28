@@ -3,7 +3,7 @@ mqtt:
   port: 1883                # defaults to 1883
   user: mqtt_user
   password: pipimann
-deviceName: walli3
+deviceName: walli4
 client_id: some_other_client
 timezone: Europe/Brussels
 update_interval: 60       # Defaults to 60
