@@ -10,7 +10,7 @@ import argparse
 import threading
 import paho.mqtt.client as mqtt
 
-from sensors import *
+from system_sensors_imports import *
 
 
 mqttClient = None
