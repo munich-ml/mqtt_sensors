@@ -1,12 +1,12 @@
 mqtt:
-  hostname: 192.168.178.63
-  port: 1883    #defaults to 1883
+  hostname: 192.168.178.63  # MQTT broker within home assistant
+  port: 1883                # defaults to 1883
   user: mqtt_user
   password: pipimann
 deviceName: pi3
 client_id: client_id_not_set
 timezone: Europe/Brussels
-update_interval: 60  #Defaults to 60
+update_interval: 60       # Defaults to 60
 sensors:
   hostname: true
   host_ip: true
